@@ -1,0 +1,27 @@
+{
+    "AviConfig": [
+        {
+            "HapticAviID": "!_!_!_AVI ID HERE_!_!_!"
+        },
+        {
+            "OSCJson": "!_!_!_FILEPATH TO LIVE OSC JSON HERE_!_!_!"
+        },
+        {
+            "OSCJsonRef": "REFERENCE AVATAR OSC.json"
+        }
+    ],
+    "VestConfig": [
+        {
+            "VestHostname": "HapticVest"
+        },
+        {
+            "VestPort": "1025"
+        },
+        {
+            "BufferLength": "50"
+        },
+        {
+            "MotorLimits": "[0.2, 1.0]"
+        }
+    ]
+}
