@@ -12,7 +12,7 @@
     ],
     "VestConfig": [
         {
-            "VestHostname": "HapticVest"
+            "VestHostname": "!_!_!_RASPI IP HERE_!_!_!"
         },
         {
             "VestPort": "1025"
