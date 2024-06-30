@@ -101,15 +101,6 @@ uint16_t floatToDuty(float e){
 }
 
 void onOscReceived(const OscMessage& m) {
-  Serial.print(m.remoteIP());
-  Serial.print(" ");
-  Serial.print(m.remotePort());
-  Serial.print(" ");
-  Serial.print(m.size());
-  Serial.print(" ");
-  Serial.print(m.address());
-  Serial.print(" ");
-  Serial.println(m.arg<String>(0));
   handle_values(m.arg<String>(0));
 }
 
@@ -132,14 +123,9 @@ void handle_values(String args){
     }
   }
   valArray[index] = floatToDuty(temp.toFloat());
-
-
-
-  Serial.print(valArray[0]);
   for (int i = 0; i < 32; i++) {
     pwmController.setChannelPWM(i, valArray[i]);
   }
-   Serial.println();
 }
 
 void loop() {
