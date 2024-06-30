@@ -62,7 +62,7 @@ void setup() {
   Serial.println(WiFi.localIP());
   // subscribe osc messages
   OscWiFi.subscribe(recv_port, "/h", onOscReceived);
-  Serial.print('starting server');
+  Serial.print("starting server");
 
 //ignore this, its literally just the startup chime
   for (int i = 0; i < 16; i++) {
