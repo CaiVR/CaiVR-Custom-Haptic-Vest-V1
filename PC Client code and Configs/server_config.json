@@ -1,7 +1,7 @@
 {
     "VestConfig": [
         {
-            "VestHostname": "!_!_!_RASPI IP HERE_!_!_!"
+            "VestHostname": "!_!_!_RASPI/arduino IP HERE_!_!_!"
         },
         {
             "VestPort": "1025"
