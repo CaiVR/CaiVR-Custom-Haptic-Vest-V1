@@ -11,15 +11,8 @@ from pythonosc import udp_client
 with open('server_config.json', 'r') as config:       #Reads Config Json and puts string into value
     config_str = config.read()
 
-AviData = json.loads(config_str)['AviConfig']
 VestData = json.loads(config_str)['VestConfig']
 
-Haptics_Avi_ID = AviData[0]['HapticAviID']  #ID of the avatar with haptics!
-print(f"Haptics_Avi_ID = {AviData[0]['HapticAviID']}")
-OSC_json = AviData[1]['OSCJson']            #Full filepath of your avatar OSC json
-print(f"OSC_json = {AviData[1]['OSCJson']}")
-OSC_json_ref = AviData[2]['OSCJsonRef']     #Filename of reference OSC json to be written placed in script folder
-print(f"OSC_json_ref = {AviData[2]['OSCJsonRef']}")
 
 """VEST CONFIG-------------------------------------------------------------------------------------------------------"""
 VestIP = VestData[0]['VestHostname']              #Vest server IP
@@ -51,20 +44,6 @@ except Exception as e:
     print(e)
 
 
-
-
-#AviDynams to OSC Json workaround
-def osc_jogger(address, *args):    #jogs OSC json for it to work w/ AviDynams
-    print(f"Checking: {args}")
-    if Haptics_Avi_ID in args:     #checks for Haptics avatar ID on connected Avatar
-        print("Haptics Detected!")
-        with open(OSC_json_ref, 'r') as DupeR:      #reads reference Json
-            with open(OSC_json, 'w') as DupeW:      #writes reference to active Json
-                DupeW.write(DupeR.read())
-        print("Json rewritten!")
-    else:
-        print("Boring... No Haptics Found!")
-
 #Handler receives & buffers incoming motor values into 1 list
 toPrint = False
 buffered_array = [float(0)] * TotalMotors      #creates array of empty floats w/ specified amount of motor slots
@@ -72,20 +51,21 @@ def motor_handler(address, *args):
     global buffered_array
     #global toPrint
     #toPrint = True
-    motor_index = int(re.search(r'\d+', address).group())
-    motor_val = float(re.search("\d+\.\d+", f"{args}").group())
-    if "Front" in address and motor_val > 0.0:
-        ScaledVal = max(MotorMin + (MotorMax - MotorMin) * motor_val, 1.0)    #Gets motor limit range, mults by value, adds to minimum for scaled clamp
-        #print(f"Front {motor_index}, {ClampedVal}")
-        buffered_array[motor_index] = round(ScaledVal, 3)
-    if "Back" in address and motor_val > 0.0:
-        ScaledVal = max(MotorMin + (MotorMax - MotorMin) * motor_val, 1.0)
-        #print(f"Back {motor_index + 16}, {ClampedVal}")
-        buffered_array[motor_index + 16] = round(ScaledVal, 3)
-    Motor_array = [float(0)] * TotalMotors
-    for i in range(TotalMotors):
-        if buffered_array[i] < Motor_array[i]:
-            buffered_array[i] = Motor_array[i]
+    if "Front" in address or "Back" in address :
+        motor_index = int(re.search(r'\d+', address).group())
+        motor_val = float(re.search(r"\d+\.\d+", f"{args}").group())
+        if "Front" in address and motor_val > 0.0:
+            ScaledVal = max(MotorMin + (MotorMax - MotorMin) * motor_val, 1.0)    #Gets motor limit range, mults by value, adds to minimum for scaled clamp
+            #print(f"Front {motor_index}, {ScaledVal}")
+            buffered_array[motor_index] = round(ScaledVal, 3)
+        if "Back" in address and motor_val > 0.0:
+            ScaledVal = max(MotorMin + (MotorMax - MotorMin) * motor_val, 1.0)
+            #print(f"Back {motor_index + 16}, {ScaledVal}")
+            buffered_array[motor_index + 16] = round(ScaledVal, 3)
+        Motor_array = [float(0)] * TotalMotors
+        for i in range(TotalMotors):
+            if buffered_array[i] < Motor_array[i]:
+                buffered_array[i] = Motor_array[i]
 
 #Async loop sends motor values after allowing them to be buffered for buffer_length
 async def buffer():
@@ -102,8 +82,8 @@ async def buffer():
 
 
 dispatcher = Dispatcher()
-dispatcher.map("/avatar/change*", osc_jogger)           #checks for avatar change & jogs OSC if is Greenlit
-dispatcher.map("/avatar/Haptics*", motor_handler)       #handles haptic data after json is jogged
+dispatcher.map("/avatar/parameters/*", motor_handler)       #handles haptic data after json is jogged
+#dispatcher.map("/avatar/Haptics*", motor_handler)       #handles haptic data after json is jogged
 #dispatcher.set_default_handler(default_handler)         #any other messages
 
 ip = "127.0.0.1"
