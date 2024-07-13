@@ -10,6 +10,7 @@ from pythonosc import udp_client
 """VRCHAT & AVATAR CONFIG--------------------------------------------------------------------------------------------"""
 with open('server_config.json', 'r') as config:       #Reads Config Json and puts string into value
     config_str = config.read()
+    print(config_str)
 
 VestData = json.loads(config_str)['VestConfig']
 
